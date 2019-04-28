@@ -6,6 +6,7 @@ use DateTime;
 use GuzzleHttp\ClientInterface;
 use Philcross\GetAddress\Exceptions;
 use GuzzleHttp\Client as GuzzleClient;
+use Philcross\GetAddress\Responses\ExpandedAddressResponse;
 use Philcross\GetAddress\Responses\PrivateAddress;
 
 class Client
@@ -147,6 +148,7 @@ class Client
             $url .= sprintf('/%s', $propertyNumber);
         }
 
+        $this->querystring['expand'] = false;
         $response =  $this->call('GET', $url);
 
         return new Responses\AddressResponse(
@@ -154,6 +156,37 @@ class Client
             $response['longitude'],
             array_map(function ($address) {
                 return new Responses\Address($address);
+            }, $response['addresses'])
+        );
+    }
+
+    /**
+     * @param $postcode
+     * @param null $propertyNumber
+     * @param bool $sortNumerically
+     *
+     * @return ExpandedAddressResponse
+     */
+    public function findExpanded($postcode, $propertyNumber = null, $sortNumerically = true){
+        $this->querystring['sort'] = (int) $sortNumerically;
+
+        $url = sprintf('find/%s', $postcode);
+
+        if (!is_null($propertyNumber)) {
+            $url .= sprintf('/%s', $propertyNumber);
+        }
+
+        $this->querystring['expand'] = 'true';
+        $response =  $this->call('GET', $url);
+
+        return new ExpandedAddressResponse(
+            $response['latitude'],
+            $response['longitude'],
+            $response['postcode'],
+            array_map(function ($address) {
+                $expandedAddress =  new Responses\ExpandedAddress();
+                $expandedAddress->fillFromArray($address);
+                return $expandedAddress;
             }, $response['addresses'])
         );
     }
