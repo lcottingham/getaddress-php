@@ -3,10 +3,10 @@
     "description": "A PHP SDK for getAddress - Address lookup API",
     "type": "library",
     "require": {
-        "guzzlehttp/guzzle": "^6.3"
+        "guzzlehttp/guzzle": "^6.3|^7.0"
     },
     "require-dev": {
-        "mockery/mockery": "^0.9.9",
+        "mockery/mockery": "^1.5",
         "phpunit/phpunit": "^5.7",
         "vlucas/phpdotenv": "^3.3"
     },
